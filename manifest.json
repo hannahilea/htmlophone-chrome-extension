@@ -3,6 +3,7 @@
   "description": "Source: https://github.com/hannahilea/htmlophone-chrome-extension",
   "version": "1.0",
   "manifest_version": 3,
+  "permissions": ["activeTab", "scripting"],
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
