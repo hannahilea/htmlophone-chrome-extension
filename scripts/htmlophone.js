@@ -1,3 +1,25 @@
+// Move to user params
+let highlightElementsDuringPlayback = true
+
+// Global vars
+let noteChoices = ["C3", "D3", "E3", "G3", "A3", "C4", "D4", "E4", "G4", "A4"]
+let nodeDict = new Map();
+let nodeSequence = []
+
+function sonifyElement(element) {
+  let name = element.nodeName;
+  if (nodeDict.get(name) == undefined) {
+    // For now, add a random note from 
+    
+    // if (name == "div") { nodeDict.set(name, "D2") } else {
+      let note = noteChoices[nodeDict.size % noteChoices.length];
+      nodeDict.set(name, note)
+    // }
+    console.log
+  }
+  nodeSequence.push({element, note: nodeDict.get(name)})
+}
+
 function walkTheDOM(node, func) {
   func(node);
   node = node.firstElementChild;
@@ -6,25 +28,6 @@ function walkTheDOM(node, func) {
     walkTheDOM(node, func);
     node = node.nextElementSibling;
   }
-}
-
-let skipHiddenElements = true
-let noteChoices = ["Cb3", "Eb3", "Gb3", "Bb3", "Cb4", "Eb4", "Gb4", "Bb4"]
-let nodeDict = new Map();
-// subdivisions are given as subarrays
-let nodeSequence = []
-
-function sonifyElement(element) {
-  let name = element.nodeName;
-  if (nodeDict.get(name) == undefined) {
-    // For now, add a random note from 
-    
-    if (name == "div") { nodeDict.set(name, "C4") } else {
-      let note = noteChoices[Math.floor(Math.random() * noteChoices.length)];
-      nodeDict.set(name, note)
-    }
-  }
-  nodeSequence.push({element, note: nodeDict.get(name)})
 }
 
 async function playHTMLophone() {
@@ -47,9 +50,12 @@ async function playHTMLophone() {
       lastElement.style.outline = "unset";
     }
     synth.triggerAttackRelease(note, 0.1, time);
-    element.style.outline = "dashed black";
-    element.scrollIntoView(false, { inline: "center", block: "center", behavior: "smooth" })
-    lastElement = element;
+    if (highlightElementsDuringPlayback){
+      element.style.outline = "dashed black";
+      element.scrollIntoView(false, { inline: "center", block: "center", behavior: "smooth" })
+      lastElement = element;
+    }
+    
   }, nodeSequence).start(0);
   seq.loop = false;
   Tone.Transport.start();
