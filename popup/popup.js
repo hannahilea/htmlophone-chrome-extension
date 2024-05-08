@@ -1,3 +1,23 @@
+let isPlaying = false;
+
+document.getElementById("button-play-page").addEventListener("click", async () => {
+  console.log("clicked")
+
+  isPlaying = !isPlaying;
+  console.log("Set playback to", isPlaying);
+  document.getElementById("button-play-page").innerHTML = isPlaying ? "Stop playing page!" : "Play my page!"
+
+  getCurrentTabID().then((tab) => {
+    chrome.tabs.sendMessage(tab.id, { play: isPlaying })
+      .then((response) => {
+        console.log("Message from the content script:");
+        console.log(response.response);
+      })
+      .catch(onError);
+  });
+
+});
+
 async function getCurrentTabID() {
   let queryOptions = { active: true, lastFocusedWindow: true };
   let [tab] = await chrome.tabs.query(queryOptions);
@@ -5,15 +25,10 @@ async function getCurrentTabID() {
   return tab;
 }
 
-document.getElementById("button-play-page").addEventListener("click", async () => {
-  console.log("Logging to special dev tools...")
-  let tab = await getCurrentTabID()
-  console.log("Tab", tab)
-
-  await chrome.scripting.executeScript({
+getCurrentTabID().then((tab) => {
+  chrome.scripting.executeScript({
     target: { tabId: tab.id },
     files: ["scripts/Tone.min.js", "scripts/htmlophone.js"],
   })
     .then(() => console.log("script injected"))
-  console.log("done")
-});
+})

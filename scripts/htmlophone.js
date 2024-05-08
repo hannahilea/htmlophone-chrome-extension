@@ -10,14 +10,14 @@ function sonifyElement(element) {
   let name = element.nodeName;
   if (nodeDict.get(name) == undefined) {
     // For now, add a random note from 
-    
+
     // if (name == "div") { nodeDict.set(name, "D2") } else {
-      let note = noteChoices[nodeDict.size % noteChoices.length];
-      nodeDict.set(name, note)
+    let note = noteChoices[nodeDict.size % noteChoices.length];
+    nodeDict.set(name, note)
     // }
     console.log
   }
-  nodeSequence.push({element, note: nodeDict.get(name)})
+  nodeSequence.push({ element, note: nodeDict.get(name) })
 }
 
 function walkTheDOM(node, func) {
@@ -30,7 +30,7 @@ function walkTheDOM(node, func) {
   }
 }
 
-async function playHTMLophone() {
+async function setUpHTMLophoneScore() {
   // # TODO: shift setup to its own function that is called once on load
   console.log("Is Tone module loaded?", Tone)
   await Tone.start();
@@ -45,25 +45,36 @@ async function playHTMLophone() {
 
   let lastElement;
 
-  const seq = new Tone.Sequence((time, {element, note}) => {
-    if (lastElement){
+  const seq = new Tone.Sequence((time, { element, note }) => {
+    if (lastElement) {
       lastElement.style.outline = "unset";
     }
     synth.triggerAttackRelease(note, 0.1, time);
-    if (highlightElementsDuringPlayback){
+    if (highlightElementsDuringPlayback) {
       element.style.outline = "dashed black";
       element.scrollIntoView(false, { inline: "center", block: "center", behavior: "smooth" })
       lastElement = element;
     }
-    
+
   }, nodeSequence).start(0);
   seq.loop = false;
   Tone.Transport.start();
 }
 
-// Do the thing!
-playHTMLophone()
+chrome.runtime.onMessage.addListener((request) => {
+  console.log("Message from the background script:");
+  console.log(request.play);
 
+  if (request.play) {
+    Tone.Transport.start()
+  }
+  else { Tone.Transport.stop() }
+
+  return Promise.resolve({ response: "Playback updated!" });
+});
+
+console.log("...script has been injected by htmlophone extension...")
+setUpHTMLophoneScore()
 
 // TODO next:
 // make hitting play multiple times....not error?
