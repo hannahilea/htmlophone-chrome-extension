@@ -8,6 +8,7 @@ function walkTheDOM(node, func) {
   }
 }
 
+let skipHiddenElements = true
 let noteChoices = ["Cb3", "Eb3", "Gb3", "Bb3", "Cb4", "Eb4", "Gb4", "Bb4"]
 let nodeDict = new Map();
 // subdivisions are given as subarrays
@@ -23,7 +24,7 @@ function sonifyElement(element) {
       nodeDict.set(name, note)
     }
   }
-  nodeSequence.push(nodeDict.get(name))
+  nodeSequence.push({element, note: nodeDict.get(name)})
 }
 
 async function playHTMLophone() {
@@ -38,12 +39,17 @@ async function playHTMLophone() {
   // Get the DOM 
   const body = document.querySelector("body");
   walkTheDOM(body, sonifyElement)
-  nodeSequence.push([])
-  console.log(nodeDict)
-  console.log(nodeSequence)
 
-  const seq = new Tone.Sequence((time, note) => {
+  let lastElement;
+
+  const seq = new Tone.Sequence((time, {element, note}) => {
+    if (lastElement){
+      lastElement.style.outline = "unset";
+    }
     synth.triggerAttackRelease(note, 0.1, time);
+    element.style.outline = "dashed black";
+    element.scrollIntoView(false, { inline: "center", block: "center", behavior: "smooth" })
+    lastElement = element;
   }, nodeSequence).start(0);
   seq.loop = false;
   Tone.Transport.start();
