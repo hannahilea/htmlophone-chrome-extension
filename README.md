@@ -14,6 +14,13 @@ Follow the steps [here](https://developer.chrome.com/docs/extensions/get-started
 4. (Optional) pin this extension to your list of Chrome extensions 
 5. To listen to a website, go to that site and then click the extension shortcut!
 
+## Compositions for HTMLophone
+Pages written specifically to be performed by the HTMLophone:
+- [Old McDonald had a webpage](https://jacobenget.com/an_htmlophone_score.html), by [@jacobenget](https://github.com/jacobenget)
+- ...
+
+Have you composed a site? Awesome! Open a pull request (or ping me!) to add it here.  
+
 ## Dev notes
 Created by following [this tutorial](https://developer.chrome.com/docs/extensions/get-started/tutorial/scripts-on-every-tab).
 
